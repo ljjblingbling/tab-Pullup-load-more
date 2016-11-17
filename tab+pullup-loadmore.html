@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+</head>
+<body>
+        <input type="hidden" id="y_gspage" value=""/>
+        <input type="hidden" id="y_nrpage" value=""/>
+        <input type="hidden" id="y_gzpage" value=""/>
+        <input type="hidden" id="y_pageCount" value=""/>
+        <input type="hidden" id="csctime" value="">
+    <ul class="changeTitle">
+        <li class="gsyc">高手收益榜</li><li class="nrsy">牛人收益榜</li><li class="gznr">关注牛股</li>
+    </ul>
+    <div class="wrap">
+        <div class="rankCon" id="bang01"></div>
+        <div class="rankCon" id="bang02"></div>
+        <div class="rankCon" id="bang03"></div>
+    </div>
+</body>
+<script src="http://ossweb-img.qq.com/images/js/jquery/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="tabfun.js"></script>
+<script type="text/javascript">
+    //tabq切换
+    $('.changeTitle li').click(function(){
+        var _index=$(this).index();
+        $(this).addClass('on').siblings().removeClass('on');
+        $('.rankCon').eq(_index).show().siblings('.rankCon').hide();
+    });
+
+    $(window).scroll(function () {
+         //滚动条距离顶部距离
+        var scrolltotop=parseFloat($(window).scrollTop());
+        //窗口高度
+        var winheight = parseFloat($(window).height());
+        //内容总高度
+        var conheight = parseFloat($(document).height())-200*1;
+        //总高度
+        var totalheight = scrolltotop + winheight;
+        //判断是否加载，当操作高度比内容大，空间充裕->加载
+        var nowTime = new Date().getTime();
+        var clickTime = $("#csctime").val();
+
+        if( clickTime != 'undefined' && (nowTime - clickTime < 1500)){
+            //alert('操作过于频繁，稍后再试');
+            console.log(222);
+        }else if(clickTime == 'undefined' || clickTime == ''){
+            $("#csctime").val(nowTime);
+        }else{
+            console.log(111);
+            $("#csctime").val(nowTime);
+            if(totalheight >= conheight ){
+                cscHuaDonglModel().upAjax();
+            }
+        }
+    });
+
+    //手势上滑 分页特效
+    var cscHuaDonglModel = function(){
+        return {
+            // 上拉滑动事件  加载新的分页内容
+            upAjax:function(){
+               var type = $("#y_ggtype").val(); //随便给的一个变量值为了区分到底是高手收益榜、牛人收益榜、还是关注牛人股；
+               if(type == 'heightrank'){    //如果是高手收益榜
+                    var page = $("#y_gspage").val();   //把此时的高手收益榜的value值赋给page;
+                }
+                if(type == 'profitsrank'){   //如果是高手收益榜
+                    var page = $("#y_nrpage").val();   //把此时的牛人收益榜的value值赋给page;
+                }
+                if(type == 'followrank'){   //如果是关注牛人股
+                    var page = $("#y_gzpage").val();   //把此时的关注牛人股的value值赋给page;
+                }
+               var pageCount = $("#y_pageCount").val();   //总条数
+
+               if(pageCount <= page*10){   //每页10条数据
+                    //没有新数据了
+                    //alert('sss');
+               }else{
+                    if(page>=1){    //如果页数大于1;
+                        page = page-1+1+1;  //页数++
+                        if(type == 'heightrank'){      //如果是高手收益榜
+                            getHeiGuess().init(page);    //调用高手收益榜异步请求方法
+                        }
+                        if(type == 'profitsrank'){
+                            getProfitsRank().init(page);
+                        }
+                        if(type == 'followrank'){
+                            getFollowStock().init(page);
+                        }
+                    }
+               }
+            },
+            // 下拉刷新事件  刷新当前页面
+            downAjax:function(){
+
+            },
+        }
+    }
+    getHeiGuess().init(1); //默认显示高手收益榜的数据
+</script>
+</html>
